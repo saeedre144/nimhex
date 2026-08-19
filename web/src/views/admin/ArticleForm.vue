@@ -11,6 +11,7 @@ const isEdit = !!route.params.id
 const title = ref('')
 const metaTitle = ref('')
 const metaDescription = ref('')
+const featuredImageAlt = ref('')
 const body = ref('')
 const status = ref('draft')
 const featuredImageUrl = ref(null)
@@ -24,9 +25,10 @@ onMounted(async () => {
     title.value = data.data.title
     metaTitle.value = data.data.meta_title || ''
     metaDescription.value = data.data.meta_description || ''
+    featuredImageAlt.value = data.data.featured_image_alt || ''
     body.value = data.data.body
     status.value = data.data.status
-    featuredImageUrl.value = data.data.featured_image_thumb
+   featuredImageUrl.value = data.data.featured_image_url || data.data.featured_image_thumb
   }
 })
 
@@ -40,11 +42,12 @@ const submit = async () => {
   saving.value = true
   try {
     const payload = {
-      title: title.value,
-      meta_title: metaTitle.value,
-      meta_description: metaDescription.value,
-      body: body.value,
-      status: status.value,
+    title: title.value,
+    meta_title: metaTitle.value,
+    meta_description: metaDescription.value,
+    featured_image_alt: featuredImageAlt.value,  
+    body: body.value,
+    status: status.value,
     }
 
     let articleId = route.params.id
@@ -58,9 +61,8 @@ const submit = async () => {
     if (featuredImageFile.value) {
       const formData = new FormData()
       formData.append('file', featuredImageFile.value)
-      await api.post(`/api/articles/${articleId}/featured-image`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      // نیازی به ست کردن دستی Content-Type نیست
+        await api.post(`/api/articles/${articleId}/featured-image`, formData)
     }
 
     router.push('/admin/articles')
@@ -87,11 +89,21 @@ const submit = async () => {
         <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title[0] }}</p>
       </div>
 
-      <div>
+        <div>
         <label class="block text-sm font-medium text-gray-700">Featured Image</label>
         <input type="file" accept="image/*" @change="uploadFeaturedImage" class="mt-1 text-sm" />
-        <img v-if="featuredImageUrl" :src="featuredImageUrl" class="mt-2 h-32 w-48 rounded-md object-cover" />
-      </div>
+        <img v-if="featuredImageUrl" :src="featuredImageUrl" :alt="featuredImageAlt" class="mt-2 h-32 w-48 rounded-md object-cover" />
+
+        <label class="mt-3 block text-sm font-medium text-gray-700">
+            Image Alt Text <span class="text-gray-400">(describe the image for SEO & accessibility)</span>
+        </label>
+        <input
+            v-model="featuredImageAlt"
+            type="text"
+            placeholder="e.g. A developer writing code on a laptop"
+            class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+        />
+        </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700">Body</label>

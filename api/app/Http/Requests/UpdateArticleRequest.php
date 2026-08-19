@@ -12,7 +12,7 @@ class UpdateArticleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,6 +28,7 @@ class UpdateArticleRequest extends FormRequest
             'meta_description' => ['nullable', 'string', 'max:160'],
             'body' => ['required', 'string'],
             'status' => ['required', 'in:draft,published'],
+            'featured_image_alt' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

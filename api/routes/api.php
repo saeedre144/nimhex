@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\MediaController;
-
+use App\Http\Controllers\PublicArticleController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -14,6 +14,9 @@ Route::get('/user', function (Request $request) {
 Route::get('/ping', fn () => response()->json(['message' => 'hello from Laravel']));
 // Route::get('/debug-users', fn () => \App\Models\User::all());
 
+
+Route::get('/public/articles', [PublicArticleController::class, 'index']);
+Route::get('/public/articles/{article:slug}', [PublicArticleController::class, 'show']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

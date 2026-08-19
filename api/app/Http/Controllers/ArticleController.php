@@ -8,6 +8,7 @@ use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 
 class ArticleController extends Controller
 {
@@ -49,7 +50,7 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        $this->authorize('update', $article);
+        Gate::authorize('update', $article);
 
         $article->update($request->validated());
 
@@ -61,26 +62,30 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        $this->authorize('delete', $article);
+        Gate::authorize('delete', $article);
 
         $article->delete();
 
         return response()->noContent();
     }
-     public function uploadFeaturedImage(Request $request, Article $article)
-    {
-        $this->authorize('update', $article);
+public function uploadFeaturedImage(Request $request, Article $article)
+{
+    Gate::authorize('update', $article);
 
-        $request->validate([
-            'file' => ['required', 'image', 'max:5120'],
-        ]);
-
-        $article->clearMediaCollection('featured');
-        $article->addMedia($request->file('file'))->toMediaCollection('featured');
-
-        return response()->json([
-            'url' => $article->getFirstMediaUrl('featured'),
-            'thumb' => $article->getFirstMediaUrl('featured', 'thumb'),
-        ]);
+    if (!$request->hasFile('file')) {
+        return response()->json(['message' => 'No file uploaded.'], 422);
     }
+
+    $request->validate([
+        'file' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+    ]);
+
+    $article->clearMediaCollection('featured');
+    $article->addMediaFromRequest('file')->toMediaCollection('featured');
+
+    return response()->json([
+        'url' => $article->getFirstMediaUrl('featured'),
+        'thumb' => $article->getFirstMediaUrl('featured', 'thumb'),
+    ]);
+}
 }

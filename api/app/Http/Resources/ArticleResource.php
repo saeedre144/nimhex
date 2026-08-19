@@ -26,6 +26,7 @@ class ArticleResource extends JsonResource
             'featured_image_thumb' => $this->getFirstMediaUrl('featured', 'thumb') ?: null,
             'author' => $this->user->name,
             'updated_at' => $this->updated_at->toDateTimeString(),
+            'featured_image_alt' => $this->featured_image_alt,
         ];
     }
 }

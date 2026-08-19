@@ -2,23 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useAuth } from '@/composables/useAuth'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import PublicLayout from '@/layouts/PublicLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
+ {
       path: '/',
-      name: 'home',
-      component: HomeView,
-      // این صفحه نیاز به لاگین دارد
-      // meta: { requiresAuth: true }, 
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
-      // اگر می‌خواهی این هم محافظت‌شده باشد، این خط را بنویس:
-      // meta: { requiresAuth: true },
+      component: PublicLayout,
+      children: [
+        { path: '', name: 'home', component: () => import('../views/HomeView.vue') },
+        { path: 'articles', name: 'articles.public', component: () => import('../views/ArticlesView.vue') },
+        { path: 'articles/:slug', name: 'articles.show', component: () => import('../views/ArticleDetailView.vue') },
+      ],
     },
     {
       path: '/login',

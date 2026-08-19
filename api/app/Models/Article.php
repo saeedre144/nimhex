@@ -23,6 +23,7 @@ class Article extends Model implements HasMedia
         'slug',
         'body',
         'status',
+        'featured_image_alt',
     ];
     
     public function user()

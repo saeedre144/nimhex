@@ -8,28 +8,19 @@ const loading = ref(true)
 
 onMounted(async () => {
   const { data } = await api.get('/api/public/articles')
-  articles.value = data.data.slice(0, 3)
+  articles.value = data.data
   loading.value = false
 })
 </script>
 
 <template>
-  <section class="mx-auto max-w-3xl px-6 py-24 text-center">
-    <h1 class="text-5xl font-bold tracking-tight text-gray-900">
-      Welcome to <span class="text-blue-600">nimhex</span>
-    </h1>
-    <p class="mt-4 text-lg text-gray-500">A place to write, publish, and share articles.</p>
-    <RouterLink
-      to="/articles"
-      class="mt-8 inline-block rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
-    >
-      Browse Articles
-    </RouterLink>
-  </section>
+  <section class="mx-auto max-w-5xl px-6 py-16">
+    <h1 class="text-3xl font-bold text-gray-900">Articles</h1>
 
-  <section v-if="!loading && articles.length" class="mx-auto max-w-5xl px-6 pb-24">
-    <h2 class="text-xl font-semibold text-gray-900">Latest articles</h2>
-    <div class="mt-6 grid gap-6 sm:grid-cols-3">
+    <div v-if="loading" class="mt-8 text-gray-400">Loading...</div>
+    <div v-else-if="articles.length === 0" class="mt-8 text-gray-400">No articles published yet.</div>
+
+    <div v-else class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <RouterLink
         v-for="article in articles"
         :key="article.id"
@@ -40,11 +31,12 @@ onMounted(async () => {
           v-if="article.featured_image"
           :src="article.featured_image"
           :alt="article.featured_image_alt || article.title"
-          class="h-40 w-full object-cover"
+          class="h-44 w-full object-cover"
         />
-        <div v-else class="h-40 w-full bg-gray-100"></div>
+        <div v-else class="h-44 w-full bg-gray-100"></div>
         <div class="p-4">
           <h3 class="font-medium text-gray-900">{{ article.title }}</h3>
+          <p class="mt-1 line-clamp-2 text-sm text-gray-500">{{ article.meta_description }}</p>
         </div>
       </RouterLink>
     </div>
